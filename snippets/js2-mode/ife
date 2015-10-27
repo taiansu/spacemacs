@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# contributor: Tai Su
+# name: if-else
+# key: ife
+# --
+if ($1:condition) {
+
+} else {
+
+}

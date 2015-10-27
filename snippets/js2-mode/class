@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+#name : ES6 class
+#key : class
+#contributor : Tai Su
+# --
+class ${1:ClassName} ${2:extends ${3:React.Component}}{
+  $4
+}
