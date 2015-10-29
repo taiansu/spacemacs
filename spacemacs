@@ -227,6 +227,7 @@ values."
   (define-key evil-insert-state-map (kbd "C-.") " => ")
   (define-key evil-normal-state-map (kbd "C-;") 'evil-switch-to-windows-last-buffer)
   (evil-leader/set-key "fd" 'helm-find-files)
+  (evil-leader/set-key "xd" 'delete-trailing-whitespace)
 
   (defun set-indent (n)
     (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)))
