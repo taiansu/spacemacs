@@ -221,16 +221,25 @@ values."
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
   (setq yas-snippet-dirs '("~/.emacs.d/private/snippets"))
+  ;(setq-default flycheck-disabled-checkers
+  ;              (append flycheck-disabled-checkers
+  ;                      '(javascript-jshint)))
+  ;(flycheck-add-mode 'javascript-eslint 'web-mode)
   )
 
 (defun dotspacemacs/user-config ()
-  (define-key evil-insert-state-map (kbd "C-.") " => ")
+  (define-key evil-insert-state-map (kbd "C-v") " => ")
+  (define-key evil-insert-state-map (kbd "C-b") " -> ")
   (define-key evil-normal-state-map (kbd "C-;") 'evil-switch-to-windows-last-buffer)
+  (define-key evil-normal-state-map (kbd "Q") 'evil-execute-macro)
   (evil-leader/set-key "fd" 'helm-find-files)
-  (evil-leader/set-key "xd" 'delete-trailing-whitespace)
+  (evil-leader/set-key "xc" 'delete-trailing-whitespace)
+  (evil-leader/set-key "sd" 'evil-search-highlight-persist-remove-all)
 
   (defun set-indent (n)
-    (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)))
+    (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)
+                                        (smartparens-strict-mode -1)
+                                        (turn-off-smartparens-mode)))
     ;; web development
     (setq coffee-tab-width n) ; coffeescript
     (setq javascript-indent-level n) ; javascript-mode
@@ -242,6 +251,8 @@ values."
     (setq css-indent-offset n) ; css-mode
     )
   (set-indent 2)
+
+  ;(define-key evil-normal-state-map (kbd "C-c p"))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -252,7 +263,8 @@ values."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(js2-basic-offset 2)
- '(js2-bounce-indent-p t)
+ '(js2-bounce-indent-p nil)
+ '(js2-mode-show-strict-warnings nil)
  '(paradox-automatically-star t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
