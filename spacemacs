@@ -24,14 +24,17 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      (auto-completion :variables
-                      auto-completion-enable-snippets-in-popup t
-                      auto-completion-enable-help-tooltip t)
-                      ; We'll set yas only read private snippets dir somewhere underneath.
+                      auto-completion-private-snippets-directory "~/.emacs.d/private/snippets/"
+                      auto-completion-enable-snippets-in-popup nil)
      better-defaults
+     colors
+     editorconfig
      git
      dash
      markdown
+     osx
      org
+     perspectives
     (shell :variables
             shell-default-height 40
             shell-default-term-shell "/bin/zsh"
@@ -66,8 +69,16 @@ values."
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
    dotspacemacs-additional-packages '(
-                                      base16-theme
+                                      spacegray-theme
+                                      color-theme-solarized
+                                      subatomic-theme
+                                      ample-theme
+                                      ; symx-theme
+                                      ; material-theme
+                                      ; badger-theme
+                                      ; darktooth-theme
                                      )
+
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '()
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -106,7 +117,7 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         base16-tomorrow-dark
+                         spacegray
                          leuven
                          )
 
@@ -220,7 +231,6 @@ values."
   (electric-pair-mode)
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
-  (setq yas-snippet-dirs '("~/.emacs.d/private/snippets"))
   ;(setq-default flycheck-disabled-checkers
   ;              (append flycheck-disabled-checkers
   ;                      '(javascript-jshint)))
@@ -228,6 +238,9 @@ values."
   )
 
 (defun dotspacemacs/user-config ()
+  (setq powerline-default-separator nil)
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+
   (define-key evil-insert-state-map (kbd "C-v") " => ")
   (define-key evil-insert-state-map (kbd "C-b") " -> ")
   (define-key evil-normal-state-map (kbd "C-;") 'evil-switch-to-windows-last-buffer)
@@ -250,9 +263,11 @@ values."
     (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
     (setq css-indent-offset n) ; css-mode
     )
-  (set-indent 2)
 
+  (set-indent 2)
   ;(define-key evil-normal-state-map (kbd "C-c p"))
+  (if (file-exists-p "~/.emacs.d/private/paradox-token.el")
+      (load-file "~/.emacs.d/private/paradox-token.el"))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -262,14 +277,18 @@ values."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(js2-basic-offset 2)
+ '(frame-background-mode (quote dark))
+ '(js2-basic-offset 2 t)
  '(js2-bounce-indent-p nil)
  '(js2-mode-show-strict-warnings nil)
- '(paradox-automatically-star t))
+ '(paradox-automatically-star t)
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:family "Source Code Pro" :foundry "nil" :slant normal :weight light :height 171 :width normal))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
- '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
+ '(powerline-active1 ((t (:background "cornflower blue" :foreground "#ffffff")))))
