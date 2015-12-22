@@ -24,6 +24,8 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      (auto-completion :variables
+                      auto-completion-return-key-behavior nil
+                      auto-completion-tab-key-behavior 'complete
                       auto-completion-private-snippets-directory "~/.emacs.d/private/snippets/"
                       auto-completion-enable-snippets-in-popup nil)
      better-defaults
@@ -38,7 +40,7 @@ values."
     (shell :variables
             shell-default-height 40
             shell-default-term-shell "/bin/zsh"
-            shell-default-shell 'term
+            shell-default-shell 'multi-term
             shell-default-position 'bottom)
      spell-checking
      syntax-checking
@@ -69,14 +71,12 @@ values."
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
    dotspacemacs-additional-packages '(
-                                      spacegray-theme
+                                      string-inflection
+                                      ;; Themes
+                                      atom-dark-theme
+                                      smyx-theme
                                       color-theme-solarized
-                                      subatomic-theme
-                                      ample-theme
-                                      ; symx-theme
-                                      ; material-theme
-                                      ; badger-theme
-                                      ; darktooth-theme
+                                      color-theme-sanityinc-tomorrow
                                      )
 
    ;; A list of packages and/or extensions that will not be install and loaded.
@@ -117,7 +117,7 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         spacegray
+                         atom-dark
                          leuven
                          )
 
@@ -129,7 +129,7 @@ values."
                                :size 17
                                :weight light
                                :width normal
-                               :powerline-scale 1.4)
+                               :powerline-scale 1.0)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
@@ -199,7 +199,7 @@ values."
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
    dotspacemacs-inactive-transparency 90
    ;; If non nil unicode symbols are displayed in the mode line. (default t)
-   dotspacemacs-mode-line-unicode-symbols t
+   dotspacemacs-mode-line-unicode-symbols nil
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters the
    ;; point when it reaches the top or bottom of the screen. (default t)
@@ -238,33 +238,44 @@ values."
   )
 
 (defun dotspacemacs/user-config ()
+  (global-set-key (kbd "TAB") 'tab-to-tab-stop);
   (setq powerline-default-separator nil)
   (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
+  (unless (display-graphic-p)
+      (setq-default dotspacemacs-themes '(default leuven)))
+
   (define-key evil-insert-state-map (kbd "C-v") " => ")
   (define-key evil-insert-state-map (kbd "C-b") " -> ")
+  (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
+  (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-normal-state-map (kbd "C-;") 'evil-switch-to-windows-last-buffer)
   (define-key evil-normal-state-map (kbd "Q") 'evil-execute-macro)
+  (define-key evil-normal-state-map (kbd "s") nil)
+  (define-key evil-normal-state-map (kbd "sk") 'evil-window-up)
+  (define-key evil-normal-state-map (kbd "sj") 'evil-window-down)
+  (define-key evil-normal-state-map (kbd "sh") 'evil-window-right)
+  (define-key evil-normal-state-map (kbd "sl") 'evil-window-left)
+  (define-key evil-normal-state-map (kbd "sm") 'spacemacs/toggle-maximize-buffer)
+  (define-key evil-normal-state-map (kbd "sn") 'next-buffer)
+  (define-key evil-normal-state-map (kbd "sp") 'previous-buffer)
+  (define-key evil-normal-state-map (kbd "sd") 'kill-this-buffer)
+  (define-key evil-normal-state-map (kbd "sc") 'delete-window)
+  (define-key evil-normal-state-map (kbd "ss") 'evil-window-split)
+  (define-key evil-normal-state-map (kbd "sv") 'split-window-right)
   (evil-leader/set-key "fd" 'helm-find-files)
+  (evil-leader/set-key "fb" 'helm-mini)
+  (evil-leader/set-key "fn" 'next-buffer)
+  (evil-leader/set-key "fp" 'previous-buffer)
+  (evil-leader/set-key "fk" 'kill-this-buffer)
   (evil-leader/set-key "xc" 'delete-trailing-whitespace)
   (evil-leader/set-key "sd" 'evil-search-highlight-persist-remove-all)
+  (evil-leader/set-key "qu" 'string-inflection-all-cycle)
 
-  (defun set-indent (n)
-    (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)
-                                        (smartparens-strict-mode -1)
-                                        (turn-off-smartparens-mode)))
-    ;; web development
-    (setq coffee-tab-width n) ; coffeescript
-    (setq javascript-indent-level n) ; javascript-mode
-    (setq js-indent-level n) ; js-mode
-    (setq js2-basic-offset n) ; js2-mode
-    (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
-    (setq web-mode-css-indent-offset n) ; web-mode, css in html file
-    (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
-    (setq css-indent-offset n) ; css-mode
-    )
+  (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)
+                                    (smartparens-strict-mode -1)
+                                    (turn-off-smartparens-mode)))
 
-  (set-indent 2)
   ;(define-key evil-normal-state-map (kbd "C-c p"))
   (if (file-exists-p "~/.emacs.d/private/paradox-token.el")
       (load-file "~/.emacs.d/private/paradox-token.el"))
@@ -277,18 +288,23 @@ values."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(css-indent-offset 2)
+ '(evil-shift-width 2)
  '(frame-background-mode (quote dark))
- '(js2-basic-offset 2 t)
+ '(indent-tabs-mode nil)
+ '(js-indent-level 2)
+ '(js2-basic-offset 2)
  '(js2-bounce-indent-p nil)
  '(js2-mode-show-strict-warnings nil)
  '(paradox-automatically-star t)
- )
+ '(shell-pop-term-shell "/bin/zsh"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Source Code Pro" :foundry "nil" :slant normal :weight light :height 171 :width normal))))
+ '(default ((t (:family "Source Code Pro" :foundry "nil" :slant normal :weight light :height 170 :width normal))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
- '(powerline-active1 ((t (:background "cornflower blue" :foreground "#ffffff")))))
+ '(powerline-active1 ((t (:background "gray16" :foreground "#ffffff"))))
+ '(term-color-white ((t (:background "#232830" :foreground "gainsboro")))))
