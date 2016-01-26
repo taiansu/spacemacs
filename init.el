@@ -24,10 +24,11 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      (auto-completion :variables
-                      auto-completion-return-key-behavior nil
-                      auto-completion-tab-key-behavior 'complete
-                      auto-completion-private-snippets-directory "~/.emacs.d/private/snippets/"
-                      auto-completion-enable-snippets-in-popup nil)
+                      ;; auto-completion-return-key-behavior nil
+                      ;; auto-completion-tab-key-behavior 'complete-expand
+                      auto-completion-enable-sort-by-usage t
+                      auto-completion-enable-snippets-in-popup t
+                      auto-completion-private-snippets-directory "~/.emacs.d/private/snippets/")
      better-defaults
      colors
      editorconfig
@@ -74,6 +75,7 @@ values."
                                       string-inflection
                                       ;; Themes
                                       atom-dark-theme
+                                      arjen-grey-theme
                                       smyx-theme
                                       color-theme-solarized
                                       color-theme-sanityinc-tomorrow
@@ -232,25 +234,27 @@ values."
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
   ;(setq-default flycheck-disabled-checkers
-  ;              (append flycheck-disabled-checkers
+  ;             (append flycheck-disabled-checkers
   ;                      '(javascript-jshint)))
   ;(flycheck-add-mode 'javascript-eslint 'web-mode)
   )
 
 (defun dotspacemacs/user-config ()
-  (global-set-key (kbd "TAB") 'tab-to-tab-stop);
+  (global-set-key (kbd "TAB") 'tab-to-tab-stop)
   (setq powerline-default-separator nil)
   (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
   (unless (display-graphic-p)
-      (setq-default dotspacemacs-themes '(default leuven)))
+    (setq-default dotspacemacs-themes '(default leuven)))
 
-  (define-key evil-insert-state-map (kbd "C-v") " => ")
-  (define-key evil-insert-state-map (kbd "C-b") " -> ")
+  (define-key evil-insert-state-map (kbd "C-]") " => ")
+  (define-key evil-insert-state-map (kbd "C-\\") " -> ")
   (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-normal-state-map (kbd "C-;") 'evil-switch-to-windows-last-buffer)
   (define-key evil-normal-state-map (kbd "Q") 'evil-execute-macro)
+  (define-key evil-normal-state-map (kbd "'") 'evil-goto-mark)
+  (define-key evil-normal-state-map (kbd "`") 'evil-goto-mark-line)
   (define-key evil-normal-state-map (kbd "s") nil)
   (define-key evil-normal-state-map (kbd "sk") 'evil-window-up)
   (define-key evil-normal-state-map (kbd "sj") 'evil-window-down)
@@ -279,7 +283,7 @@ values."
   ;(define-key evil-normal-state-map (kbd "C-c p"))
   (if (file-exists-p "~/.emacs.d/private/paradox-token.el")
       (load-file "~/.emacs.d/private/paradox-token.el"))
-  )
+)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -288,8 +292,11 @@ values."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#282828" "#FAB1AB" "#D1FA71" "#FFA600" "#7b68ee" "#dc8cc3" "#96D9F1" "#F7F7F7"])
  '(css-indent-offset 2)
  '(evil-shift-width 2)
+ '(fci-rule-color "#151515" t)
  '(frame-background-mode (quote dark))
  '(indent-tabs-mode nil)
  '(js-indent-level 2)
@@ -297,7 +304,8 @@ values."
  '(js2-bounce-indent-p nil)
  '(js2-mode-show-strict-warnings nil)
  '(paradox-automatically-star t)
- '(shell-pop-term-shell "/bin/zsh"))
+ '(selection-coding-system (quote utf-8))
+ '(shell-pop-term-shell "/bin/zsh" t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -306,5 +314,7 @@ values."
  '(default ((t (:family "Source Code Pro" :foundry "nil" :slant normal :weight light :height 170 :width normal))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
+ '(evil-search-highlight-persist-highlight-face ((t (:background "dim gray"))))
  '(powerline-active1 ((t (:background "gray16" :foreground "#ffffff"))))
+ '(region ((t (:background "dim gray"))))
  '(term-color-white ((t (:background "#232830" :foreground "gainsboro")))))
