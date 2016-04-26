@@ -74,11 +74,8 @@ values."
    dotspacemacs-additional-packages '(
                                       string-inflection
                                       ;; Themes
-                                      atom-dark-theme
-                                      arjen-grey-theme
+                                      heroku-theme
                                       smyx-theme
-                                      color-theme-solarized
-                                      color-theme-sanityinc-tomorrow
                                      )
 
    ;; A list of packages and/or extensions that will not be install and loaded.
@@ -121,8 +118,8 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         atom-dark
-                         leuven
+                         heroku
+                         whiteboard
                          )
 
    ;; If non nil the cursor color matches the state color.
@@ -130,8 +127,8 @@ values."
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 17
-                               :weight light
+                               :size 15
+                               :weight normal
                                :width normal
                                :powerline-scale 1.0)
    ;; The leader key
@@ -193,7 +190,7 @@ values."
    ;; If non nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
    ;; (default nil) (Emacs 24.4+ only)
-   dotspacemacs-maximized-at-startup t
+   dotspacemacs-maximized-at-startup nil
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
@@ -274,8 +271,8 @@ values."
   (evil-leader/set-key "fn" 'next-buffer)
   (evil-leader/set-key "fp" 'previous-buffer)
   (evil-leader/set-key "fk" 'kill-this-buffer)
-  (evil-leader/set-key "xc" 'delete-trailing-whitespace)
-  (evil-leader/set-key "sd" 'evil-search-highlight-persist-remove-all)
+  (evil-leader/set-key "xv" 'delete-trailing-whitespace)
+  (evil-leader/set-key "xc" 'evil-search-highlight-persist-remove-all)
   (evil-leader/set-key "qu" 'string-inflection-all-cycle)
 
   (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)
