@@ -130,7 +130,7 @@ values."
                                :size 15
                                :weight normal
                                :width normal
-                               :powerline-scale 1.0)
+                               :powerline-scale 1.2)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
@@ -266,7 +266,7 @@ values."
   (define-key evil-normal-state-map (kbd "sc") 'delete-window)
   (define-key evil-normal-state-map (kbd "ss") 'evil-window-split)
   (define-key evil-normal-state-map (kbd "sv") 'split-window-right)
-  (evil-leader/set-key "fd" 'helm-find-files)
+  (evil-leader/set-key "fd" 'helm-projectile-find-file)
   (evil-leader/set-key "fb" 'helm-mini)
   (evil-leader/set-key "fn" 'next-buffer)
   (evil-leader/set-key "fp" 'previous-buffer)
