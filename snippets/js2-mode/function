@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Tai Su
-# name: function
-# key: function
-# --
-
-function $1:name\($2:argument\) {
-  $3
-}

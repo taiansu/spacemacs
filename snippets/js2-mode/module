@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Tai Su
-# name: module exports
-# key: module
-# --
-module.exports = $1;
