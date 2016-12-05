@@ -24,13 +24,14 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
     (auto-completion :variables
-                    auto-completion-enable-sort-by-usage t
-                    auto-completion-enable-snippets-in-popup t)
+                     auto-completion-enable-sort-by-usage t
+                     auto-completion-enable-snippets-in-popup t)
      better-defaults
      emacs-lisp
      git
      markdown
      org
+     osx
      (shell :variables
             shell-default-height 40
             shell-default-term-shell "/bin/zsh"
@@ -40,6 +41,7 @@ values."
      syntax-checking
      ;; langs
      c-c++
+     dash
      elixir
      emacs-lisp
      erlang
@@ -55,6 +57,7 @@ values."
      scheme
      shell-scripts
      sql
+     version-control
      yaml
      ;; frameworks
      react
@@ -114,7 +117,7 @@ values."
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
-   dotspacemacs-startup-lists '(recents projects)
+   dotspacemacs-startup-lists '(projects recents)
    ;; Number of recent files to show in the startup buffer. Ignored if
    ;; `dotspacemacs-startup-lists' doesn't include `recents'. (default 5)
    dotspacemacs-startup-recent-list-size 5
@@ -123,11 +126,7 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(
-                         heroku
-                         whiteboard
-                         spacemacs-light
-                         )
+   dotspacemacs-themes '(heroku)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
@@ -270,16 +269,21 @@ values."
 
 (defun dotspacemacs/user-config ()
   (setq powerline-default-separator nil)
+  (setq js2-strict-missing-semi-warning nil)
   (global-set-key (kbd "TAB") 'tab-to-tab-stop)
   (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
   (unless (display-graphic-p)
-    (setq-default dotspacemacs-themes '(default leuven)))
+    (setq-default dotspacemacs-themes '(default colorsarenice-light adwaita flatui software-morning
+    whiteboard)))
 
-  (define-key evil-insert-state-map (kbd "C-]") " => ")
-  (define-key evil-insert-state-map (kbd "C-\\") " -> ")
+  (define-key evil-insert-state-map (kbd "M-m") " => ")
+  (define-key evil-insert-state-map (kbd "M-.") " -> ")
+  (define-key evil-insert-state-map (kbd "M-,") " <- ")
+  (define-key evil-insert-state-map (kbd "M-j") 'yas-expand)
   (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-normal-state-map (kbd "M-p") 'helm-projectile-find-file)
   (define-key evil-normal-state-map (kbd "C-;") 'evil-switch-to-windows-last-buffer)
   (define-key evil-normal-state-map (kbd "Q") 'evil-execute-macro)
   (define-key evil-normal-state-map (kbd "'") 'evil-goto-mark)
@@ -296,14 +300,16 @@ values."
   (define-key evil-normal-state-map (kbd "sc") 'delete-window)
   (define-key evil-normal-state-map (kbd "ss") 'evil-window-split)
   (define-key evil-normal-state-map (kbd "sv") 'split-window-right)
-  (evil-leader/set-key "fd" 'helm-projectile-find-file)
-  (evil-leader/set-key "fb" 'helm-mini)
-  (evil-leader/set-key "fn" 'next-buffer)
-  (evil-leader/set-key "fp" 'previous-buffer)
+
   (evil-leader/set-key "fk" 'kill-this-buffer)
   (evil-leader/set-key "xv" 'delete-trailing-whitespace)
   (evil-leader/set-key "xc" 'evil-search-highlight-persist-remove-all)
   (evil-leader/set-key "qu" 'string-inflection-all-cycle)
+  (eval-after-load 'yasnippet
+    '(progn
+        (define-key yas-keymap [(backspace)] 'yas-skip-and-clear-or-delete-char)
+        (define-key yas-keymap (kbd "M-j") 'yas-next-field-or-maybe-expand)
+        (define-key yas-keymap (kbd "M-k") 'yas-prev)))
 
   (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)
                                     (smartparens-strict-mode -1)
@@ -321,7 +327,9 @@ values."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(package-selected-packages
+   (quote
+    (spinner reveal-in-osx-finder pbcopy osx-trash osx-dictionary launchctl helm-dash dash-at-point git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl pcache multiple-cursors flyspell-correct auto-complete anzu highlight yasnippet magit-popup async inf-ruby dash go-guru ob-elixir org minitest insert-shebang hide-comnt helm-purpose window-purpose imenu-list auctex-latexmk hydra iedit anaconda-mode auctex smartparens undo-tree elixir-mode flycheck haskell-mode go-mode company helm helm-core markdown-mode projectile magit git-commit with-editor f js2-mode simple-httpd s pug-mode yapfify yaml-mode xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit string-inflection sql-indent spacemacs-theme spaceline smyx-theme smeargle slim-mode shell-pop scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rake rainbow-delimiters racket-mode quelpa pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode paradox orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree mwim multi-term move-text mmm-mode markdown-toc magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc jade-mode intero info+ indent-guide ido-vertical-mode hy-mode hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers highlight-indentation heroku-theme help-fns+ helm-themes helm-swoop helm-pydoc helm-projectile helm-mode-manager helm-make helm-hoogle helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag haskell-snippets google-translate golden-ratio go-eldoc gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md geiser flyspell-correct-helm flycheck-pos-tip flycheck-mix flycheck-haskell flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help erlang emmet-mode elisp-slime-nav dumb-jump disaster define-word cython-mode company-web company-tern company-statistics company-shell company-quickhelp company-go company-ghci company-ghc company-cabal company-c-headers company-auctex company-anaconda column-enforce-mode coffee-mode cmm-mode cmake-mode clean-aindent-mode clang-format chruby bundler bracketed-paste auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile alchemist aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
