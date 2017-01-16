@@ -49,7 +49,7 @@ values."
      haskell
      html
      javascript
-     ;;latex
+     latex
      markdown
      python
      racket
