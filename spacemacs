@@ -84,7 +84,7 @@ This function should only modify configuration layer settings."
    ;; To use a local version of a package, use the `:location' property:
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(exunit)
+   dotspacemacs-additional-packages '(dap-mode exunit)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -478,9 +478,14 @@ you should place your code here."
   (setq column-number-mode t)
   (electric-pair-mode)
   (show-paren-mode t)
+
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.eex\\'" . web-mode))
+
   (define-key evil-insert-state-map (kbd "M-m") " => ")
   (define-key evil-insert-state-map (kbd "M-.") " -> ")
   (define-key evil-insert-state-map (kbd "M-,") " <- ")
+
   (use-package lsp-mode
     :commands lsp
     :ensure t
@@ -491,6 +496,17 @@ you should place your code here."
     (add-to-list 'exec-path "~/Projects/source/elixir-ls/release"))
     (use-package lsp-ui :commands lsp-ui-mode)
     (use-package company-lsp :commands company-lsp)
+    (with-eval-after-load 'elixir-mode
+    (spacemacs/declare-prefix-for-mode 'elixir-mode
+      "mt" "tests" "testing related functionality")
+    (spacemacs/set-leader-keys-for-major-mode 'elixir-mode
+      "tb" 'exunit-verify-all
+      "ta" 'exunit-verify
+      "tk" 'exunit-rerun
+      "tt" 'exunit-verify-single))
+    (require 'dap-elixir)
+    (dap-ui-mode)
+    (dap-mode)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
