@@ -39,7 +39,7 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     helm
+     (helm :variables helf-enable-auto-resize t)
      (auto-completion :variables
                       auto-completion-enable-sort-by-usage t
                       auto-completion-enable-help-tooltip 'manual
@@ -47,6 +47,7 @@ This function should only modify configuration layer settings."
      better-defaults
      git
      (org :variables
+          org-startup-indented t
           org-enable-github-support t
           org-enable-bootstrap-support t
           org-enable-reveal-js-support t)
@@ -54,28 +55,30 @@ This function should only modify configuration layer settings."
      (shell :variables
             shell-default-shell 'multi-term
             shell-default-term-shell "/usr/local/bin/zsh"
-            shell-default-height 30
+            shell-default-height 40
             shell-default-position 'bottom)
      spell-checking
      syntax-checking
      version-control
 
-     ;; languages
+     ;; tools
      lsp
+
+     ;; languages
      html
      markdown
-     javascript
+     (javascript :variables javascript-backend 'lsp)
      react
      (python :variables python-backend 'lsp)
      ruby
+     rust
      haskell
      emacs-lisp
      markdown
      erlang
      elixir
      (latex :variables
-            latex-enable-folding t)
-   )
+            latex-enable-folding t))
 
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -84,7 +87,7 @@ This function should only modify configuration layer settings."
    ;; To use a local version of a package, use the `:location' property:
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(dap-mode exunit)
+   dotspacemacs-additional-packages '(s format-all editorconfig dap-mode exunit)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -207,7 +210,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(afternoon
+   dotspacemacs-themes '(smyx
                          leuven)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
@@ -217,7 +220,7 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(spacemacs :separator nil :separator-scale 1.5)
+   dotspacemacs-mode-line-theme '(doom :separator nil :separator-scale 1.2)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
@@ -226,7 +229,7 @@ It should only modify the values of Spacemacs settings."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 15
+                               :size 14
                                :weight normal
                                :width normal)
 
@@ -246,11 +249,11 @@ It should only modify the values of Spacemacs settings."
 
    ;; Major mode leader key is a shortcut key which is the equivalent of
    ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
-   dotspacemacs-major-mode-leader-key ","
+   dotspacemacs-major-mode-leader-key nil
 
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
    ;; (default "C-M-m")
-   dotspacemacs-major-mode-emacs-leader-key "C-M-m"
+   dotspacemacs-major-mode-emacs-leader-key "C-M-,"
 
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs `C-i', `TAB' and `C-m', `RET'.
@@ -314,7 +317,7 @@ It should only modify the values of Spacemacs settings."
    ;; If non-nil a progress bar is displayed when spacemacs is loading. This
    ;; may increase the boot time on some systems and emacs builds, set it to
    ;; nil to boost the loading time. (default t)
-   dotspacemacs-loading-progress-bar t
+   dotspacemacs-loading-progress-bar nil
 
    ;; If non-nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
@@ -465,6 +468,9 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+  (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+  (add-to-list 'load-path "~/Projects/source/distel/elisp")
+  (add-to-list 'exec-path "~/.local/bin/")
 )
 
 (defun dotspacemacs/user-config ()
@@ -474,6 +480,7 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+  (require 's)
   (set-fontset-font "fontset-default" 'han '("Source Han San"))
   (setq column-number-mode t)
   (electric-pair-mode)
@@ -482,10 +489,21 @@ you should place your code here."
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.eex\\'" . web-mode))
 
+  ;; key maps
+
+  ;; prevent kill emacs daemon
+  (evil-leader/set-key "q q" 'spacemacs/frame-killer)
+
+
+  (define-key global-map (kbd "H-p") 'helm-projectile-find-file)
   (define-key evil-insert-state-map (kbd "M-m") " => ")
   (define-key evil-insert-state-map (kbd "M-.") " -> ")
   (define-key evil-insert-state-map (kbd "M-,") " <- ")
+  (evil-leader/set-key
+    "v" nil
+    "vf" 'format-all-buffer)
 
+  ;; lsp configs
   (use-package lsp-mode
     :commands lsp
     :ensure t
@@ -494,8 +512,11 @@ you should place your code here."
     (elixir-mode . lsp)
     :init
     (add-to-list 'exec-path "~/Projects/source/elixir-ls/release"))
+
     (use-package lsp-ui :commands lsp-ui-mode)
     (use-package company-lsp :commands company-lsp)
+
+    ;; elixir mode
     (with-eval-after-load 'elixir-mode
     (spacemacs/declare-prefix-for-mode 'elixir-mode
       "mt" "tests" "testing related functionality")
@@ -507,7 +528,26 @@ you should place your code here."
     (require 'dap-elixir)
     (dap-ui-mode)
     (dap-mode)
-  )
+
+  ;; erlang
+  ;; (require 'distel)
+  ;; (distel-setup)
+
+  ;; (defconst distel-shell-keys
+  ;;  '(("\C-\M-i"   erl-complete)
+  ;;    ("\M-?"      erl-complete)
+  ;;    ("\M-."      erl-find-source-under-point)
+  ;;    ("\M-,"      erl-find-source-unwind)
+  ;;    ("\M-*"      erl-find-source-unwind)
+  ;;   )
+  ;;  "Additional keys to bind when in Erlang shell.")
+
+  ;; (add-hook 'erlang-shell-mode-hook
+  ;;   (lambda ()
+  ;;     ;; add some Distel bindings to the Erlang shell
+  ;;     (dolist (spec distel-shell-keys)
+  ;;       (define-key erlang-shell-mode-map (car spec) (cadr spec)))))
+)
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -530,3 +570,42 @@ you should place your code here."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
+ '(ansi-color-names-vector
+   ["#d2ceda" "#f2241f" "#67b11d" "#b1951d" "#3a81c3" "#a31db1" "#21b8c7" "#655370"])
+ '(erlang-indent-level 2)
+ '(evil-want-Y-yank-to-eol nil)
+ '(fci-rule-color "#151515")
+ '(js-indent-level 2)
+ '(js2-missing-semi-one-line-override t)
+ '(js2-mode-show-parse-errors nil)
+ '(js2-mode-show-strict-warnings nil)
+ '(js2-strict-cond-assign-warning nil)
+ '(js2-strict-inconsistent-return-warning nil)
+ '(js2-strict-missing-semi-warning nil)
+ '(js2-strict-var-hides-function-arg-warning nil)
+ '(js2-strict-var-redeclaration-warning nil)
+ '(lsp-ui-doc-enable nil t)
+ '(lsp-ui-doc-max-width 60)
+ '(package-selected-packages
+   (quote
+    (format-all company-quickhelp web-mode web-beautify tagedit slim-mode scss-mode sass-mode reveal-in-osx-finder pug-mode pbcopy osx-trash osx-dictionary mmm-mode markdown-toc markdown-mode livid-mode skewer-mode simple-httpd launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc helm-css-scss haml-mode gh-md emmet-mode company-web web-completion-data company-tern dash-functional tern coffee-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl flyspell-correct-helm flyspell-correct auto-dictionary ob-elixir flycheck-mix flycheck-credo alchemist elixir-mode xterm-color unfill smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mwim multi-term magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit ghub treepy graphql with-editor eshell-z eshell-prompt-extras esh-help company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+ '(standard-indent 2))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
