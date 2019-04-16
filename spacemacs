@@ -33,7 +33,7 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(csv
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
@@ -229,7 +229,7 @@ It should only modify the values of Spacemacs settings."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 14
+                               :size 15
                                :weight normal
                                :width normal)
 
@@ -482,26 +482,40 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   (require 's)
   (set-fontset-font "fontset-default" 'han '("Source Han San"))
+  (setq evil-treemacs-state-cursor '(bar . 1))
   (setq column-number-mode t)
   (electric-pair-mode)
   (show-paren-mode t)
 
+  ;; mac keys
+  (setq mac-command-modifier 'super)
+
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.eex\\'" . web-mode))
 
-  ;; key maps
+  (global-set-key (kbd "C-x o") 'ace-window)
+  (global-set-key (kbd "s-p") 'helm-projectile-find-file)
+  (evil-set-initial-state 'term-mode 'emacs)
+  (evil-set-initial-state 'calculator-mode 'emacs)
+  (push 'term-mode evil-escape-excluded-major-modes)
+  (evil-define-key 'emacs term-raw-map (kbd "C-c") 'term-send-raw)
 
   ;; prevent kill emacs daemon
   (evil-leader/set-key "q q" 'spacemacs/frame-killer)
 
-
-  (define-key global-map (kbd "H-p") 'helm-projectile-find-file)
-  (define-key evil-insert-state-map (kbd "M-m") " => ")
-  (define-key evil-insert-state-map (kbd "M-.") " -> ")
+  ;; key maps
+  (define-key evil-insert-state-map (kbd "M-m") " -> ")
   (define-key evil-insert-state-map (kbd "M-,") " <- ")
+  (define-key evil-insert-state-map (kbd "M-.") " => ")
   (evil-leader/set-key
     "v" nil
     "vf" 'format-all-buffer)
+
+  ;; term keys
+  (defun term-send-up()(interactive)(term-send-raw-string "\e[A"))
+  (defun term-send-down()(interactive)(term-send-raw-string "\e[B"))
+  (defun term-send-right()(interactive)(term-send-raw-string "\e[C"))
+  (defun term-send-left()(interactive)(term-send-raw-string "\e[D"))
 
   ;; lsp configs
   (use-package lsp-mode
@@ -525,9 +539,9 @@ you should place your code here."
       "ta" 'exunit-verify
       "tk" 'exunit-rerun
       "tt" 'exunit-verify-single))
-    (require 'dap-elixir)
-    (dap-ui-mode)
-    (dap-mode)
+  ;;  (require 'dap-elixir)
+  ;;  (dap-ui-mode)
+  ;;  (dap-mode)
 
   ;; erlang
   ;; (require 'distel)
@@ -600,12 +614,13 @@ This function is called at the very end of Spacemacs initialization."
  '(lsp-ui-doc-max-width 60)
  '(package-selected-packages
    (quote
-    (format-all company-quickhelp web-mode web-beautify tagedit slim-mode scss-mode sass-mode reveal-in-osx-finder pug-mode pbcopy osx-trash osx-dictionary mmm-mode markdown-toc markdown-mode livid-mode skewer-mode simple-httpd launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc helm-css-scss haml-mode gh-md emmet-mode company-web web-completion-data company-tern dash-functional tern coffee-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl flyspell-correct-helm flyspell-correct auto-dictionary ob-elixir flycheck-mix flycheck-credo alchemist elixir-mode xterm-color unfill smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mwim multi-term magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit ghub treepy graphql with-editor eshell-z eshell-prompt-extras esh-help company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
- '(standard-indent 2))
+    (csv-mode company-quickhelp web-mode web-beautify tagedit slim-mode scss-mode sass-mode reveal-in-osx-finder pug-mode pbcopy osx-trash osx-dictionary mmm-mode markdown-toc markdown-mode livid-mode skewer-mode simple-httpd launchctl json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc helm-css-scss haml-mode gh-md emmet-mode company-web web-completion-data company-tern dash-functional tern coffee-mode git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl flyspell-correct-helm flyspell-correct auto-dictionary ob-elixir flycheck-mix flycheck-credo alchemist elixir-mode xterm-color unfill smeargle shell-pop orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mwim multi-term magit-gitflow htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy flycheck-pos-tip pos-tip flycheck evil-magit magit magit-popup git-commit ghub treepy graphql with-editor eshell-z eshell-prompt-extras esh-help company-statistics company auto-yasnippet yasnippet ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async)))
+ '(standard-indent 2)
+ '(treemacs-no-png-images t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(treemacs-root-face ((t (:inherit font-lock-constant-face :underline t :weight bold)))))
 )
